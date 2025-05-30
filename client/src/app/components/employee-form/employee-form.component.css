@@ -1,0 +1,353 @@
+.employee-form-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.breadcrumb {
+  margin-bottom: 1rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--primary-600);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: var(--primary-700);
+  text-decoration: underline;
+}
+
+.back-arrow {
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  transition: all 0.3s ease;
+  border: 1px solid var(--gray-100);
+}
+
+.card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--gray-200);
+  padding-bottom: var(--space-4);
+}
+
+.card-header h2 {
+  margin-bottom: 0.5rem;
+  color: var(--primary-700);
+}
+
+.form-subtitle {
+  color: var(--gray-500);
+  margin-top: var(--space-2);
+}
+
+.form-row {
+  display: flex;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--gray-700);
+}
+
+input,
+select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background-color: var(--gray-50);
+}
+
+input:hover,
+select:hover {
+  border-color: var(--gray-400);
+}
+
+input:focus,
+select:focus {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+  outline: none;
+  background-color: white;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.5s;
+}
+
+.btn:active::after {
+  transform: scale(0, 0);
+  opacity: 0.3;
+  transition: 0s;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-outline {
+  border: 1px solid var(--primary-500);
+  color: var(--primary-500);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background-color: rgba(var(--primary-rgb), 0.05);
+}
+
+.btn-primary {
+  background-color: var(--primary-500);
+  color: white;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover:not([disabled]) {
+  background-color: var(--primary-600);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:active:not([disabled]) {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+input.error,
+select.error {
+  border-color: var(--error-500);
+}
+
+.form-error {
+  color: var(--error-500);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.loading,
+.error-message,
+.success-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  border-radius: 8px;
+  margin: 1rem 0;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.loading {
+  color: var(--primary-700);
+  background-color: rgba(var(--primary-rgb), 0.05);
+}
+
+.error-message {
+  color: var(--error-600);
+  background-color: rgba(var(--error-rgb), 0.05);
+  border: 1px solid var(--error-200);
+}
+
+.success-message {
+  color: var(--success-600);
+  background-color: rgba(var(--success-rgb), 0.05);
+  border: 1px solid var(--success-200);
+}
+
+.error-icon,
+.success-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.success-icon {
+  color: var(--success-500);
+}
+
+.form-tip {
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  background-color: rgba(var(--info-rgb), 0.05);
+  border-radius: 6px;
+  border-left: 3px solid var(--info-500);
+}
+
+.form-tip p {
+  display: flex;
+  align-items: center;
+  color: var(--gray-700);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.tip-icon {
+  margin-right: 8px;
+  font-size: 1.1rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.spinner,
+.btn-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(var(--primary-rgb), 0.3);
+  border-radius: 50%;
+  border-top-color: var(--primary-500);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 0.75rem;
+}
+
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  margin: 0 0.5rem 0 0;
+  border-width: 2px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Medium sized screens */
+@media (max-width: 992px) and (min-width: 769px) {
+  .form-row {
+    gap: var(--space-3);
+  }
+}
+
+/* Mobile screens */
+@media (max-width: 768px) {
+  .employee-form-container {
+    margin: 1rem auto;
+  }
+
+  .card {
+    padding: 1.5rem;
+    border-radius: 8px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: var(--space-3);
+  }
+
+  .btn {
+    width: 100%;
+    padding: 0.875rem;
+  }
+
+  input,
+  select {
+    font-size: 16px;
+    /* Prevents iOS zoom on focus */
+    padding: 0.875rem;
+  }
+
+  .card-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .breadcrumb {
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeInUp 0.4s ease-out;
+}

@@ -1,0 +1,207 @@
+<div class="employee-form-container">
+  <div class="breadcrumb">
+    <a routerLink="/employees" class="back-link">
+      <span class="back-arrow">←</span> Back to Employee List
+    </a>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h2>{{ isEditMode ? "Edit Employee" : "Add New Employee" }}</h2>
+      <p class="form-subtitle">
+        {{
+          isEditMode
+            ? "Update employee information"
+            : "Enter employee details to add a new record"
+        }}
+      </p>
+    </div>
+
+    <div *ngIf="successMessage" class="success-message">
+      <div class="success-icon">✓</div>
+      <p>{{ successMessage }}</p>
+    </div>
+
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Loading employee data...</p>
+    </div>
+
+    <div *ngIf="error" class="error-message">
+      <div class="error-icon">⚠️</div>
+      <p>{{ error }}</p>
+    </div>
+
+    <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            [class.error]="isFieldInvalid('name')"
+            aria-describedby="nameError"
+            autocomplete="name"
+          />
+          <div
+            *ngIf="isFieldInvalid('name')"
+            class="form-error"
+            id="nameError"
+            role="alert"
+          >
+            Full name is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="experience">Experience (years)</label>
+          <input
+            type="number"
+            id="experience"
+            formControlName="experience"
+            [class.error]="isFieldInvalid('experience')"
+            aria-describedby="experienceError"
+            min="0"
+          />
+          <div
+            *ngIf="isFieldInvalid('experience')"
+            class="form-error"
+            id="experienceError"
+            role="alert"
+          >
+            <span *ngIf="employeeForm.get('experience')?.errors?.['required']">
+              Experience is required
+            </span>
+            <span *ngIf="employeeForm.get('experience')?.errors?.['min']">
+              Experience must be 0 or greater
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="position">Position</label>
+          <input
+            type="text"
+            id="position"
+            formControlName="position"
+            [class.error]="isFieldInvalid('position')"
+            aria-describedby="positionError"
+          />
+          <div
+            *ngIf="isFieldInvalid('position')"
+            class="form-error"
+            id="positionError"
+            role="alert"
+          >
+            Position is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="department">Department</label>
+          <select
+            id="department"
+            formControlName="department"
+            [class.error]="isFieldInvalid('department')"
+            aria-describedby="departmentError"
+          >
+            <option value="" disabled>Select Department</option>
+            <option value="HR">HR</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Finance">Finance</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Sales">Sales</option>
+            <option value="Operations">Operations</option>
+            <option value="Customer Support">Customer Support</option>
+            <option value="AIML">AIML</option>
+          </select>
+          <div
+            *ngIf="isFieldInvalid('department')"
+            class="form-error"
+            id="departmentError"
+            role="alert"
+          >
+            Department is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dateOfJoining">Date of Joining</label>
+          <input
+            type="date"
+            id="dateOfJoining"
+            formControlName="dateOfJoining"
+            [class.error]="isFieldInvalid('dateOfJoining')"
+            aria-describedby="dateOfJoiningError"
+          />
+          <div
+            *ngIf="isFieldInvalid('dateOfJoining')"
+            class="form-error"
+            id="dateOfJoiningError"
+            role="alert"
+          >
+            Date of joining is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="salary">Salary</label>
+          <input
+            type="number"
+            id="salary"
+            formControlName="salary"
+            [class.error]="isFieldInvalid('salary')"
+            aria-describedby="salaryError"
+            min="0"
+            step="100"
+          />
+          <div
+            *ngIf="isFieldInvalid('salary')"
+            class="form-error"
+            id="salaryError"
+            role="alert"
+          >
+            <span *ngIf="employeeForm.get('salary')?.errors?.['required']">
+              Salary is required
+            </span>
+            <span *ngIf="employeeForm.get('salary')?.errors?.['min']">
+              Salary must be greater than 0
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-outline"
+          routerLink="/employees"
+          aria-label="Cancel and return to employee list"
+        >
+          <span>Cancel</span>
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="employeeForm.invalid || submitting"
+          [attr.aria-label]="(isEditMode ? 'Update' : 'Save') + ' employee'"
+        >
+          <div *ngIf="submitting" class="btn-spinner" aria-hidden="true"></div>
+          <span>{{ isEditMode ? "Update" : "Save" }} Employee</span>
+        </button>
+      </div>
+
+      <div class="form-tip" *ngIf="!isEditMode">
+        <p>
+          <span class="tip-icon">💡</span>
+          All fields are required. Make sure to provide accurate information for
+          proper record keeping.
+        </p>
+      </div>
+    </form>
+  </div>
+</div>

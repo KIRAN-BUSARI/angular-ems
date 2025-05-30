@@ -1,0 +1,441 @@
+<div class="employee-list">
+  <div class="list-header">
+    <div class="header-title">
+      <h2>Employee Directory</h2>
+      <a routerLink="/employees/add" class="btn btn-primary add-btn">
+        <span class="material-icons">add</span>
+        Add Employee
+      </a>
+    </div>
+    <div class="search-bar">
+      <div class="search-input-container">
+        <span class="material-icons search-icon">search</span>
+        <input
+          type="text"
+          placeholder="Search employees..."
+          [(ngModel)]="searchTerm"
+          (input)="filterEmployees()"
+          aria-label="Search employees"
+        />
+        <button
+          *ngIf="searchTerm"
+          class="clear-search"
+          (click)="clearSearch()"
+          aria-label="Clear search"
+        >
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <select
+        [(ngModel)]="filterDepartment"
+        (change)="filterEmployees()"
+        aria-label="Filter by department"
+        class="department-filter"
+      >
+        <option value="">All Departments</option>
+        <option *ngFor="let dept of departments" [value]="dept">
+          {{ dept }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Skeleton loader for the table -->
+  <div *ngIf="loading" class="loading">
+    <!-- Stats card skeletons -->
+    <div class="employee-stats">
+      <div class="stat-card skeleton">
+        <div class="skeleton-value"></div>
+        <div class="skeleton-label"></div>
+      </div>
+      <div class="stat-card skeleton">
+        <div class="skeleton-value"></div>
+        <div class="skeleton-label"></div>
+      </div>
+    </div>
+
+    <!-- Table skeleton -->
+    <div class="table-container skeleton-table">
+      <div class="table-responsive">
+        <table class="table employee-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Position</th>
+              <th>Department</th>
+              <th>Experience</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let i of [1, 2, 3, 4, 5]">
+              <td><div class="skeleton-text"></div></td>
+              <td><div class="skeleton-text"></div></td>
+              <td><div class="skeleton-text"></div></td>
+              <td><div class="skeleton-text"></div></td>
+              <td>
+                <div class="action-buttons">
+                  <div class="skeleton-button"></div>
+                  <div class="skeleton-button"></div>
+                  <div class="skeleton-button"></div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <p>{{ error }}</p>
+    <button class="btn btn-primary" (click)="loadEmployees()">Try Again</button>
+  </div>
+
+  <div *ngIf="!loading && !error">
+    <!-- Stats cards with icons - only show when data is loaded -->
+    <div class="employee-stats">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <span class="material-icons">people</span>
+        </div>
+        <span class="stat-value">{{ employees.length }}</span>
+        <span class="stat-label">Total Employees</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <span class="material-icons">business</span>
+        </div>
+        <span class="stat-value">{{ getDepartmentCount() }}</span>
+        <span class="stat-label">Departments</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <span class="material-icons">timer</span>
+        </div>
+        <span class="stat-value">{{
+          getAverageExperience() | number : "1.0-1"
+        }}</span>
+        <span class="stat-label">Avg. Experience (years)</span>
+      </div>
+    </div>
+
+    <div *ngIf="filteredEmployees.length === 0" class="empty-state">
+      <p>No employees found. Add some employees to get started!</p>
+      <a routerLink="/employees/add" class="btn btn-primary">Add Employee</a>
+    </div>
+
+    <div *ngIf="filteredEmployees.length > 0" class="table-container">
+      <div class="table-controls">
+        <div class="filter-tags" *ngIf="searchTerm || filterDepartment">
+          <div class="filter-tag" *ngIf="searchTerm">
+            Search: "{{ searchTerm }}"
+            <button class="tag-close" (click)="clearSearch()">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+          <div class="filter-tag" *ngIf="filterDepartment">
+            Department: {{ filterDepartment }}
+            <button class="tag-close" (click)="clearDepartmentFilter()">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+        </div>
+        <div
+          class="pagination-controls"
+          *ngIf="filteredEmployees.length > pageSize"
+        >
+          <button
+            class="pagination-btn"
+            [disabled]="currentPage === 1"
+            (click)="changePage(currentPage - 1)"
+            aria-label="Previous page"
+          >
+            <span class="material-icons">navigate_before</span>
+          </button>
+          <span class="page-info">
+            Page {{ currentPage }} of {{ totalPages }}
+          </span>
+          <button
+            class="pagination-btn"
+            [disabled]="currentPage === totalPages"
+            (click)="changePage(currentPage + 1)"
+            aria-label="Next page"
+          >
+            <span class="material-icons">navigate_next</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table employee-table">
+          <thead>
+            <tr>
+              <th (click)="sortTable('name')" class="sortable">
+                Name
+                <span class="sort-icon" *ngIf="sortColumn === 'name'">
+                  <span class="material-icons" *ngIf="sortDirection === 'asc'"
+                    >arrow_upward</span
+                  >
+                  <span class="material-icons" *ngIf="sortDirection === 'desc'"
+                    >arrow_downward</span
+                  >
+                </span>
+              </th>
+              <th (click)="sortTable('position')" class="sortable">
+                Position
+                <span class="sort-icon" *ngIf="sortColumn === 'position'">
+                  <span class="material-icons" *ngIf="sortDirection === 'asc'"
+                    >arrow_upward</span
+                  >
+                  <span class="material-icons" *ngIf="sortDirection === 'desc'"
+                    >arrow_downward</span
+                  >
+                </span>
+              </th>
+              <th (click)="sortTable('department')" class="sortable">
+                Department
+                <span class="sort-icon" *ngIf="sortColumn === 'department'">
+                  <span class="material-icons" *ngIf="sortDirection === 'asc'"
+                    >arrow_upward</span
+                  >
+                  <span class="material-icons" *ngIf="sortDirection === 'desc'"
+                    >arrow_downward</span
+                  >
+                </span>
+              </th>
+              <th (click)="sortTable('experience')" class="sortable">
+                Experience
+                <span class="sort-icon" *ngIf="sortColumn === 'experience'">
+                  <span class="material-icons" *ngIf="sortDirection === 'asc'"
+                    >arrow_upward</span
+                  >
+                  <span class="material-icons" *ngIf="sortDirection === 'desc'"
+                    >arrow_downward</span
+                  >
+                </span>
+              </th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let employee of paginatedEmployees; let i = index"
+              class="table-row"
+              [class.row-odd]="i % 2 === 0"
+              [class.row-even]="i % 2 === 1"
+            >
+              <td>{{ employee.name }}</td>
+              <td>{{ employee.position }}</td>
+              <td>
+                <span class="department-badge">{{ employee.department }}</span>
+              </td>
+              <td>
+                <div class="experience-wrapper">
+                  <div
+                    class="experience-bar"
+                    [style.width.%]="getExperiencePercentage(employee)"
+                  ></div>
+                  <span>{{ employee.experience }} years</span>
+                </div>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button
+                    class="btn-icon view-btn"
+                    (click)="viewEmployeeDetails(employee)"
+                    [attr.aria-label]="'View details of ' + employee.name"
+                    title="View details"
+                  >
+                    <span class="material-icons" aria-hidden="true"
+                      >visibility</span
+                    >
+                  </button>
+                  <a
+                    [routerLink]="['/employees/edit', employee._id]"
+                    class="btn-icon edit-btn"
+                    [attr.aria-label]="'Edit ' + employee.name"
+                    title="Edit employee"
+                  >
+                    <span class="material-icons" aria-hidden="true">edit</span>
+                  </a>
+                  <button
+                    class="btn-icon delete-btn"
+                    (click)="confirmDelete(employee)"
+                    [attr.aria-label]="'Delete ' + employee.name"
+                    title="Delete employee"
+                  >
+                    <span class="material-icons" aria-hidden="true"
+                      >delete</span
+                    >
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Bottom pagination for larger datasets -->
+      <div
+        class="pagination-controls bottom-pagination"
+        *ngIf="filteredEmployees.length > pageSize * 2"
+      >
+        <button
+          class="pagination-btn"
+          [disabled]="currentPage === 1"
+          (click)="changePage(currentPage - 1)"
+          aria-label="Previous page"
+        >
+          <span class="material-icons">navigate_before</span>
+        </button>
+        <div class="page-numbers">
+          <button
+            *ngFor="let page of getPageNumbers()"
+            class="page-btn"
+            [class.active]="page === currentPage"
+            (click)="changePage(page)"
+          >
+            {{ page }}
+          </button>
+        </div>
+        <button
+          class="pagination-btn"
+          [disabled]="currentPage === totalPages"
+          (click)="changePage(currentPage + 1)"
+          aria-label="Next page"
+        >
+          <span class="material-icons">navigate_next</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Employee Details Modal -->
+<div
+  *ngIf="selectedEmployee"
+  class="modal"
+  role="dialog"
+  aria-labelledby="employeeDetailsTitle"
+>
+  <div class="modal-content" tabindex="-1">
+    <div class="modal-header">
+      <h3 id="employeeDetailsTitle">Employee Details</h3>
+      <button class="close-btn" (click)="closeModal()" aria-label="Close modal">
+        <span class="material-icons" aria-hidden="true">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="employee-details">
+        <div class="detail-row">
+          <span class="detail-label">Name:</span>
+          <span class="detail-value">{{ selectedEmployee.name }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Position:</span>
+          <span class="detail-value">{{ selectedEmployee.position }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Department:</span>
+          <span class="detail-value">{{ selectedEmployee.department }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Experience:</span>
+          <span class="detail-value"
+            >{{ selectedEmployee.experience }} years</span
+          >
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Date of Joining:</span>
+          <span class="detail-value">{{
+            selectedEmployee.dateOfJoining | date : "mediumDate"
+          }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Salary:</span>
+          <span class="detail-value">{{
+            selectedEmployee.salary | currency
+          }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a
+        [routerLink]="['/employees/edit', selectedEmployee._id]"
+        class="btn btn-primary"
+        >Edit</a
+      >
+      <button class="btn btn-outline" (click)="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div
+  *ngIf="employeeToDelete"
+  class="modal"
+  role="dialog"
+  aria-labelledby="deleteConfirmTitle"
+>
+  <div class="modal-content" tabindex="-1">
+    <div class="modal-header">
+      <h3 id="deleteConfirmTitle">Confirm Delete</h3>
+      <button
+        class="close-btn"
+        (click)="cancelDelete()"
+        aria-label="Close modal"
+      >
+        <span class="material-icons" aria-hidden="true">close</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete {{ employeeToDelete.name }}?</p>
+      <p class="warning-text">This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button
+        class="btn btn-danger"
+        (click)="deleteEmployee()"
+        aria-label="Confirm delete employee"
+      >
+        Delete
+      </button>
+      <button
+        class="btn btn-outline"
+        (click)="cancelDelete()"
+        aria-label="Cancel delete operation"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div
+  *ngIf="notification"
+  class="toast-notification"
+  [class.show]="notification"
+  [class.success]="notificationType === 'success'"
+  [class.error]="notificationType === 'error'"
+  role="alert"
+  aria-live="assertive"
+>
+  <div class="toast-content">
+    <span class="material-icons" *ngIf="notificationType === 'success'"
+      >check_circle</span
+    >
+    <span class="material-icons" *ngIf="notificationType === 'error'"
+      >error</span
+    >
+    {{ notification }}
+  </div>
+  <button
+    class="toast-close"
+    (click)="clearNotification()"
+    aria-label="Close notification"
+  >
+    <span class="material-icons">close</span>
+  </button>
+</div>
